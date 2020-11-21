@@ -1,5 +1,9 @@
 import os
-from flask import Flask
+from flask import (
+    Flask, flash, render_template, 
+    redirect, request, session, url_for)
+from flask_pymongo import PyMongo
+from bson.objectid import ObjectId
 if os.path.exists("env.py"):
     import env
 
@@ -10,11 +14,14 @@ app.config["MONGO_DBNAME"] = os.environ.get("MONGO_DBNAME")
 app.config["MONGO_URI"] = os.environ.get("MONGO_URI")
 app.secret_key = os.environ.get("SECRET_KEY")
 
-# NEXT SET UP AN INSTANCE OF PYMONGO NEXT
+mongo = PyMongo(app)
+
 
 @app.route("/")
-def hello():
-    return "Hello world..!... again"
+@app.route("/get_tasks")
+def get_tasks():
+    tasks = mongo.db.tasks.find()
+    return render_template("tasks.html", tasks=tasks)
 
 
 if __name__ == "__main__":
