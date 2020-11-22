@@ -24,10 +24,24 @@ def get_tasks():
     return render_template("tasks.html", tasks=tasks)
 
 
-@app.route("/add_task")
+@app.route("/add_task", methods=["GET", "POST"])
 def add_task():
+    if request.method == "POST":
+        
+        task ={
+            "category_name": request.form.get("category_name"),
+            "task_name": request.form.get("task_name"),
+            "task_description": request.form.get("task_description"),
+            # "created_by": session["user"]
+        }
+# Now, when this function is called, if the requested method is POST, 
+        
+        mongo.db.tasks.insert_one(task)
+        flash("Task successfully Added")
+        return redirect(url_for("get_tasks"))
+# then it will perform all steps here and insert a new task.    
     categories = mongo.db.categories.find().sort("category_name", 1)
-    return render_template("add_task.html", categories=categories)
+    return render_template("add_task.html", categories=categories) # Otherwise, it will revert to the default method of GET, and display the template with our # form to be completed.
 
 
 if __name__ == "__main__":
