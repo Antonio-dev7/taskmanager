@@ -24,6 +24,13 @@ def get_tasks():
     return render_template("tasks.html", tasks=tasks)
 
 
+@app.route("/search", methods=["GET","POST"])
+def search():
+    query = request.form.get("query")                               # query is from our form we created on the command line under pthon3
+    tasks =list(mongo.db.tasks.find({"$text": {"$search": query}})) #This dictionary uses '$text', which itself is expecting another dictionary of '$search'.Essentially, this means that we want to perform a '$search' on any '$text Index' for this
+    return render_template("tasks.html", tasks=tasks)
+
+
 @app.route("/add_task", methods=["GET", "POST"])
 def add_task():
     if request.method == "POST":
@@ -41,8 +48,9 @@ def add_task():
         return redirect(url_for("get_tasks"))
 # then it will perform all steps here and insert a new task.    
     categories = mongo.db.categories.find().sort("category_name", 1)
-    return render_template("add_task.html", categories=categories) # Otherwise, it will revert to the default method of GET, and display the template with our # form to be completed.
-
+    return render_template("add_task.html", categories=categories) 
+    # Otherwise, it will revert to the default method of GET, 
+    # and display the template with our # form to be completed.
 
 @app.route("/edit_task/<task_id>", methods=["GET", "POST"])
 def edit_task(task_id):
